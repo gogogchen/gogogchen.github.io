@@ -99,61 +99,83 @@
     <div class="container">
         <h1>📚 數學題解範例 - 除法</h1>
         
-        <div class="question">
+        <div class="question" id="question">
             <strong>題目：</strong><br>
-            禮堂裏有 135 張椅子，李老師把椅子平均分成 9 行，每行有 ____________張椅子
+            <span id="questionText"></span>
         </div>
 
-        <div class="hint">
-            💡 提示：把總數除以行數（135 ÷ 9）
+        <div class="hint" id="hint" style="display: none;">
+            💡 提示：<span id="hintText"></span>
         </div>
 
         <div class="chart-container">
-            <div class="chart-title">📊 椅子分配圖</div>
+            <div class="chart-title" id="chartTitle">📊 視覺化圖表</div>
             
-            <div class="bars-wrapper">
-                <div class="bar-column">
-                    <div class="bar-fill"></div>
-                    <div class="bar-label">第1行</div>
-                </div>
-                <div class="bar-column">
-                    <div class="bar-fill"></div>
-                    <div class="bar-label">第2行</div>
-                </div>
-                <div class="bar-column">
-                    <div class="bar-fill"></div>
-                    <div class="bar-label">第3行</div>
-                </div>
-                <div class="bar-column">
-                    <div class="bar-fill"></div>
-                    <div class="bar-label">第4行</div>
-                </div>
-                <div class="bar-column">
-                    <div class="bar-fill"></div>
-                    <div class="bar-label">第5行</div>
-                </div>
-                <div class="bar-column">
-                    <div class="bar-fill"></div>
-                    <div class="bar-label">第6行</div>
-                </div>
-                <div class="bar-column">
-                    <div class="bar-fill"></div>
-                    <div class="bar-label">第7行</div>
-                </div>
-                <div class="bar-column">
-                    <div class="bar-fill"></div>
-                    <div class="bar-label">第8行</div>
-                </div>
-                <div class="bar-column">
-                    <div class="bar-fill"></div>
-                    <div class="bar-label">第9行</div>
-                </div>
-            </div>
+            <div class="bars-wrapper" id="barsWrapper"></div>
 
-            <div class="total-info">
-                總共 135 張椅子 ÷ 9 行 = ?
-            </div>
+            <div class="total-info" id="totalInfo"></div>
         </div>
     </div>
+
+    <script>
+        // 從 URL 獲取參數
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                total: parseInt(params.get('total')) || 135,
+                rows: parseInt(params.get('rows')) || 9,
+                item: params.get('item') || '椅子',
+                unit: params.get('unit') || '張',
+                person: params.get('person') || '李老師',
+                showHint: params.get('hint') === 'true'
+            };
+        }
+
+        // 初始化頁面
+        function init() {
+            const params = getUrlParams();
+            const perRow = Math.floor(params.total / params.rows);
+            
+            // 設置題目
+            document.getElementById('questionText').innerHTML = 
+                `禮堂裏有 ${params.total} ${params.unit}${params.item}，${params.person}把${params.item}平均分成 ${params.rows} 行，每行有 ____________${params.unit}${params.item}`;
+            
+            // 設置提示（如果需要）
+            if (params.showHint) {
+                document.getElementById('hint').style.display = 'block';
+                document.getElementById('hintText').textContent = 
+                    `把總數除以行數（${params.total} ÷ ${params.rows}）`;
+            }
+            
+            // 設置圖表標題
+            document.getElementById('chartTitle').textContent = 
+                `📊 ${params.item}分配圖`;
+            
+            // 生成柱狀圖
+            const barsWrapper = document.getElementById('barsWrapper');
+            for (let i = 1; i <= params.rows; i++) {
+                const barColumn = document.createElement('div');
+                barColumn.className = 'bar-column';
+                
+                const barFill = document.createElement('div');
+                barFill.className = 'bar-fill';
+                
+                const barLabel = document.createElement('div');
+                barLabel.className = 'bar-label';
+                barLabel.textContent = `第${i}行`;
+                
+                barColumn.appendChild(barFill);
+                barColumn.appendChild(barLabel);
+                barsWrapper.appendChild(barColumn);
+            }
+            
+            // 設置總計信息
+            document.getElementById('totalInfo').textContent = 
+                `總共 ${params.total} ${params.unit}${params.item} ÷ ${params.rows} 行 = ?`;
+        }
+
+        // 頁面載入時初始化
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>
