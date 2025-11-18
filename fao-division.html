@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 學習百分比</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2d3436;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .icon {
+            font-size: 40px;
+            text-align: center;
+        }
+        
+        .bar-container {
+            margin: 30px 0;
+        }
+        
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2d3436;
+        }
+        
+        .bar {
+            width: 100%;
+            height: 50px;
+            background: #e0e0e0;
+            border-radius: 25px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #55efc4, #00b894);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            transition: width 1s ease;
+        }
+        
+        .description {
+            text-align: center;
+            color: #636e72;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📊</div>
+        <h1>閱讀進度條形圖</h1>
+        <h1>（一本書有170頁）</h1>
+        
+        <div class="bar-container">
+            <div class="bar-label">
+                <span>已閱讀</span>
+                <span>未閱讀</span>
+            </div>
+            <div class="bar">
+                <div class="bar-fill" id="bar1">三天后的的閱讀進度 </div>
+            </div>
+        </div>
+        
+        <div class="description">
+            <strong>你能根據進度，猜猜還剩下多少百分比嗎？</strong><br>
+            用你的方法算算看，老師相信你一定可以！👍
+        </div>
+    </div>
+    
+    <script>
+        // 動畫效果
+        window.onload = function() {
+            document.getElementById('bar1').style.width = '75%';
+        };
+    </script>
+</body>
+</html>
