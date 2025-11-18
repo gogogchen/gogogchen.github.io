@@ -122,11 +122,9 @@
         function getUrlParams() {
             const params = new URLSearchParams(window.location.search);
             return {
+                question: params.get('question') || '禮堂裏有 135 張椅子，李老師把椅子平均分成 9 行，每行有 ____________張椅子',
                 total: parseInt(params.get('total')) || 135,
                 rows: parseInt(params.get('rows')) || 9,
-                item: params.get('item') || '椅子',
-                unit: params.get('unit') || '張',
-                person: params.get('person') || '李老師',
                 showHint: params.get('hint') === 'true'
             };
         }
@@ -137,8 +135,7 @@
             const perRow = Math.floor(params.total / params.rows);
             
             // 設置題目
-            document.getElementById('questionText').innerHTML = 
-                `禮堂裏有 ${params.total} ${params.unit}${params.item}，${params.person}把${params.item}平均分成 ${params.rows} 行，每行有 ____________${params.unit}${params.item}`;
+            document.getElementById('questionText').innerHTML = params.question;
             
             // 設置提示（如果需要）
             if (params.showHint) {
@@ -148,8 +145,7 @@
             }
             
             // 設置圖表標題
-            document.getElementById('chartTitle').textContent = 
-                `📊 ${params.item}分配圖`;
+            document.getElementById('chartTitle').textContent = '📊 視覺化圖表';
             
             // 生成柱狀圖
             const barsWrapper = document.getElementById('barsWrapper');
@@ -171,7 +167,7 @@
             
             // 設置總計信息
             document.getElementById('totalInfo').textContent = 
-                `總共 ${params.total} ${params.unit}${params.item} ÷ ${params.rows} 行 = ?`;
+                `總共 ${params.total} ÷ ${params.rows} 行 = ?`;
         }
 
         // 頁面載入時初始化
