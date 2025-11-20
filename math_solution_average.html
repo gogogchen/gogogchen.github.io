@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>數學題解範例 - 平均分</title>
+    <style>
+        body {
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .question {
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        .hint {
+            background-color: #fff9e6;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 16px;
+            color: #666;
+        }
+        .chart-container {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #fafafa;
+            border-radius: 8px;
+        }
+        .chart-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        td {
+            padding: 20px;
+            text-align: center;
+            font-size: 20px;
+            border: 2px solid #e0e0e0;
+            background-color: white;
+        }
+        .score-cell {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            font-weight: bold;
+            font-size: 32px;
+        }
+        .total-row {
+            background-color: #fff3e0;
+            font-weight: bold;
+            color: #e65100;
+        }
+        .average-row {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            font-weight: bold;
+            font-size: 24px;
+            color: #2c3e50;
+        }
+        .question-mark {
+            font-size: 40px;
+            color: #ff9800;
+        }
+        .summary {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 數學題解範例 - 平均分</h1>
+        
+        <div class="question">
+            <strong>題目：</strong><br>
+            <span id="questionText"></span>
+        </div>
+
+        <div class="hint" id="hint" style="display: none;">
+            💡 提示：<span id="hintText"></span>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">📋 分數統計表</div>
+            
+            <table id="scoreTable">
+                <thead>
+                    <tr>
+                        <th>次數</th>
+                        <th>分數</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+
+            <div class="summary" id="summary"></div>
+        </div>
+    </div>
+
+    <script>
+        // 從 URL 獲取參數
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            
+            // 解析分數列表 (格式: label1:score1,label2:score2)
+            const scoresString = params.get('scores') || '第一次+第二次:173,第三次:97';
+            const scores = scoresString.split(',').map(item => {
+                const [label, score] = item.split(':');
+                return { label, score: parseFloat(score) };
+            });
+            
+            return {
+                question: params.get('question') || '沛思第一次和第二次默書的分數總和是 173 分，第三次默書的分數是 97 分。他這三次默書的平均分數是____________分。',
+                scores: scores,
+                totalLabel: params.get('totalLabel') || '總分',
+                averageLabel: params.get('averageLabel') || '平均分',
+                showHint: params.get('hint') === 'true'
+            };
+        }
+
+        // 初始化頁面
+        function init() {
+            const params = getUrlParams();
+            
+            // 計算總分
+            let total = 0;
+            params.scores.forEach(item => {
+                total += item.score;
+            });
+            
+            // 計算次數（假設合併的次數從標籤中提取）
+            let count = 0;
+            params.scores.forEach(item => {
+                if (item.label.includes('+')) {
+                    // 計算包含幾個次數
+                    count += item.label.split('+').length;
+                } else {
+                    count += 1;
+                }
+            });
+            
+            const average = total / count;
+            
+            // 設置題目
+            document.getElementById('questionText').innerHTML = params.question;
+            
+            // 設置提示（如果需要）
+            if (params.showHint) {
+                document.getElementById('hint').style.display = 'block';
+                let hintText = '';
+                params.scores.forEach((item, index) => {
+                    if (index > 0) hintText += ' + ';
+                    hintText += item.score;
+                });
+                document.getElementById('hintText').textContent = 
+                    `總分 = ${hintText} = ${total}；平均分 = ${total} ÷ ${count} = ?`;
+            }
+            
+            // 生成表格
+            const tableBody = document.getElementById('tableBody');
+            
+            // 添加每次分數
+            params.scores.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.label}</td>
+                    <td class="score-cell">${item.score} 分</td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            // 添加總分行
+            const totalRow = document.createElement('tr');
+            totalRow.className = 'total-row';
+            totalRow.innerHTML = `
+                <td>${params.totalLabel}</td>
+                <td><span class="question-mark">?</span> 分</td>
+            `;
+            tableBody.appendChild(totalRow);
+            
+            // 添加平均分行
+            const avgRow = document.createElement('tr');
+            avgRow.className = 'average-row';
+            avgRow.innerHTML = `
+                <td>${params.averageLabel}</td>
+                <td><span class="question-mark">?</span> 分</td>
+            `;
+            tableBody.appendChild(avgRow);
+            
+            // 設置摘要
+            document.getElementById('summary').textContent = 
+                `總共 ${count} 次，總分 ${total} 分 ÷ ${count} = ?`;
+        }
+
+        // 頁面載入時初始化
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
