@@ -131,8 +131,6 @@
                 <tbody id="tableBody">
                 </tbody>
             </table>
-
-            <div class="summary" id="summary"></div>
         </div>
     </div>
 
@@ -225,10 +223,6 @@
                 <td><span class="question-mark">?</span> 分</td>
             `;
             tableBody.appendChild(avgRow);
-            
-            // 設置摘要
-            document.getElementById('summary').textContent = 
-                `總共 ${count} 次，總分 ${total} 分 ÷ ${count} = ?`;
         }
 
         // 頁面載入時初始化
