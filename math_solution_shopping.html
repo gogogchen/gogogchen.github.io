@@ -159,7 +159,9 @@
             const itemsString = params.get('items') || '朱古力:🍫:384:1,糖果:🍬:21.9:5';
             const items = itemsString.split(',').map(item => {
                 const [name, icon, price, quantity] = item.split(':');
-                return { name, icon, price: parseFloat(price), quantity: parseInt(quantity) };
+                // 如果價格是 ? 或無效，保留為字符串 '?'
+                const priceValue = price === '?' || isNaN(parseFloat(price)) ? '?' : parseFloat(price);
+                return { name, icon, price: priceValue, quantity: parseInt(quantity) };
             });
             
             return {
@@ -176,10 +178,12 @@
             // 設置題目
             document.getElementById('questionText').innerHTML = params.question;
             
-            // 計算總金額
+            // 計算總金額（跳過問號價格）
             let total = 0;
             params.items.forEach(item => {
-                total += item.price * item.quantity;
+                if (item.price !== '?' && typeof item.price === 'number') {
+                    total += item.price * item.quantity;
+                }
             });
             
             // 設置提示（如果需要）
