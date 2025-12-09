@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>披薩分數可視化</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f8faff;
+            font-family: 'Microsoft JhengHei', sans-serif;
+        }
+        .pizza-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 24px;
+            text-align: center;
+        }
+        h2 {
+            font-size: 24px;
+            color: #333;
+            margin: 0 0 20px 0;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 2px;
+            border: 2px solid;
+        }
+        .legend-yellow {
+            background: #fbbf24;
+            border-color: #f59e0b;
+        }
+        .legend-gray {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+        .eaten {
+            fill: #f3f4f6;
+            stroke: #d1d5db;
+        }
+        .remaining {
+            fill: #fbbf24;
+            stroke: #f59e0b;
+        }
+        .pizza-crust {
+            fill: #d97706;
+            stroke: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <div class="pizza-container">
+        <h2>披薩狀態</h2>
+        <svg width="300" height="300" viewBox="0 0 300 300">
+            <circle cx="150" cy="150" r="140" class="pizza-crust" stroke-width="8"/>
+            <g id="pizza-slices"></g>
+            <circle cx="150" cy="150" r="4" fill="#92400e"/>
+        </svg>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color legend-yellow"></div>
+                <span>剩餘 (<span id="remaining-count">7</span>塊)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color legend-gray"></div>
+                <span>已吃 (<span id="eaten-count">5</span>塊)</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== 從 URL 參數讀取設置 =====
+        // 使用方式: pizza.html?total=12&eaten=5
+        // total = 總片數（披薩切成多少塊）
+        // eaten = 已吃片數（吃掉了多少塊）
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // 從 URL 讀取參數，如果沒有則使用預設值
+        const TOTAL_SLICES = parseInt(urlParams.get('total')) || 12;
+        const EATEN_SLICES = parseInt(urlParams.get('eaten')) || 5;
+        // 剩餘片數（自動計算）= 總片數 - 已吃片數
+        const REMAINING_SLICES = TOTAL_SLICES - EATEN_SLICES;
+        
+        // ===== 顏色說明 =====
+        // eaten類 = 已吃掉的部分（灰白色 #f3f4f6）
+        // remaining類 = 剩餘的部分（黃色 #fbbf24）
+        
+        function createPizzaSlice(centerX, centerY, radius, startAngle, endAngle, isEaten) {
+            const startRadians = (startAngle * Math.PI) / 180;
+            const endRadians = (endAngle * Math.PI) / 180;
+            
+            const x1 = centerX + radius * Math.cos(startRadians);
+            const y1 = centerY + radius * Math.sin(startRadians);
+            const x2 = centerX + radius * Math.cos(endRadians);
+            const y2 = centerY + radius * Math.sin(endRadians);
+            
+            const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+            const pathData = `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
+            
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("d", pathData);
+            // 重要：isEaten=true時顯示灰白色（已吃），isEaten=false時顯示黃色（剩餘）
+            path.setAttribute("class", isEaten ? 'eaten' : 'remaining');
+            path.setAttribute("stroke-width", "2");
+            
+            return path;
+        }
+
+        function drawPizza(totalSlices, eatenSlices) {
+            const slicesContainer = document.getElementById('pizza-slices');
+            slicesContainer.innerHTML = '';
+            
+            const anglePerSlice = 360 / totalSlices;
+            
+            // 繪製所有披薩片
+            for (let i = 0; i < totalSlices; i++) {
+                const startAngle = i * anglePerSlice - 90;
+                const endAngle = (i + 1) * anglePerSlice - 90;
+                // 前eatenSlices個為已吃（灰白色），後面的為剩餘（黃色）
+                const isEaten = i < eatenSlices;
+                
+                const slice = createPizzaSlice(150, 150, 130, startAngle, endAngle, isEaten);
+                slicesContainer.appendChild(slice);
+            }
+        }
+
+        // 初始化：繪製12塊披薩，前5塊已吃（灰白色），後7塊剩餘（黃色）
+        drawPizza(TOTAL_SLICES, EATEN_SLICES);
+        
+        // 更新圖例顯示
+        document.getElementById('eaten-count').textContent = EATEN_SLICES;
+        document.getElementById('remaining-count').textContent = REMAINING_SLICES;
+    </script>
+</body>
+</html>
